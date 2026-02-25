@@ -1,0 +1,14 @@
+{
+  "orgName": "Bom Sabor Dev",
+  "edition": "Developer",
+  "features": [
+    "EnableSetPasswordInApi",
+    "MultiCurrency",
+    "Communities"
+  ],
+  "settings": {
+    "lightningExperienceSettings": {
+      "enableS1DesktopEnabled": true
+    }
+  }
+}
