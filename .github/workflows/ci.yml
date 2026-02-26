@@ -33,7 +33,7 @@ jobs:
         run: |
           sf org create scratch \
             --definition-file config/project-scratch-def.json \
-            --alias ci-scratch \
+            --alias bom-sabor-dev \
             --duration-days 1 \
             --set-default
 
