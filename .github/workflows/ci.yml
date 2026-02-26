@@ -22,7 +22,7 @@ jobs:
             --client-id ${{ secrets.SF_CLIENT_ID }} \
             --jwt-key-file server.key \
             --username ${{ secrets.SF_USERNAME }} \
-            --alias ci-devhub \
+            --alias devhub \
             --instance-url https://login.salesforce.com
 
       - name: Set Dev Hub
@@ -33,7 +33,7 @@ jobs:
         run: |
           sf org create scratch \
             --definition-file config/project-scratch-def.json \
-            --alias ci-devhub \
+            --alias devhub \
             --duration-days 1 \
             --set-default
 
