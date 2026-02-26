@@ -25,14 +25,18 @@ jobs:
             --alias devhub \
             --instance-url https://login.salesforce.com
 
+      - name: Set Dev Hub
+        run: sf config set target-dev-hub=devhub
+
+
       - name: Create Scratch Org
         run: |
           sf org create scratch \
             --definition-file config/project-scratch-def.json \
             --alias ci-scratch \
-            --target-dev-hub devhub \
             --duration-days 1 \
             --set-default
+            - name: Create Scratch Org
 
       - name: Deploy Source
         run: sf project deploy start
