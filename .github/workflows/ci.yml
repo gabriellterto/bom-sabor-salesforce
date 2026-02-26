@@ -28,5 +28,22 @@ jobs:
       - name: Deploy Source
         run: sf project deploy start --target-org dev
 
-      - name: Run Tests
-        run: sf apex run test --target-org dev --result-format human --code-coverage
+      - name: Install jq
+        run: sudo apt-get install jq
+
+      - name: Run Apex Tests with Coverage
+        run: |
+          sf apex run test \
+            --target-org dev \
+            --result-format json \
+            --code-coverage \
+            --output-dir test-results
+
+          COVERAGE=$(jq '.result.summary.orgWideCoverage' test-results/test-result.json)
+
+          echo "Org Wide Coverage: $COVERAGE%"
+
+          if [ "$COVERAGE" -lt 75 ]; then
+            echo "❌ Coverage is below 75%"
+            exit 1
+          fi
