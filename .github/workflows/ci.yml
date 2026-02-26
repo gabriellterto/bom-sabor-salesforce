@@ -33,13 +33,14 @@ jobs:
 
       - name: Run Apex Tests with Coverage
         run: |
-          sf apex run test \
+          RESULT=$(sf apex run test \
             --target-org dev \
             --result-format json \
             --code-coverage \
-            --output-dir test-results
+            --wait 10 \
+            --synchronous)
 
-          COVERAGE=$(jq '.result.summary.orgWideCoverage' test-results/test-result.json)
+          COVERAGE=$(echo $RESULT | jq '.result.summary.orgWideCoverage')
 
           echo "Org Wide Coverage: $COVERAGE%"
 
