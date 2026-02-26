@@ -1,0 +1,51 @@
+﻿name: CI Pipeline
+
+on:
+  push:
+    branches: [develop]
+  pull_request:
+    branches: [develop]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Salesforce CLI
+        run: npm install @salesforce/cli --global
+
+      - name: Authenticate
+        run: |
+          echo "${{ secrets.SF_JWT_KEY }}" > server.key
+          sf org login jwt \
+            --client-id ${{ secrets.SF_CLIENT_ID }} \
+            --jwt-key-file server.key \
+            --username ${{ secrets.SF_USERNAME }} \
+            --alias dev \
+            --instance-url https://login.salesforce.com
+
+      - name: Deploy Source
+        run: sf project deploy start --target-org dev
+
+      - name: Install jq
+        run: sudo apt-get install jq
+
+      - name: Run Apex Tests with Coverage
+        run: |
+          RESULT=$(sf apex run test \
+            --target-org dev \
+            --result-format json \
+            --code-coverage \
+            --wait 10 \
+            --synchronous)
+
+          COVERAGE=$(echo $RESULT | jq '.result.summary.orgWideCoverage')
+
+          echo "Org Wide Coverage: $COVERAGE%"
+
+          if [ "$COVERAGE" -lt 75 ]; then
+            echo "❌ Coverage is below 75%"
+            exit 1
+          fi
