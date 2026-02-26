@@ -30,6 +30,7 @@ jobs:
           sf org create scratch \
             --definition-file config/project-scratch-def.json \
             --alias ci-scratch \
+            --target-dev-hub devhub \
             --duration-days 1 \
             --set-default
 
@@ -41,4 +42,7 @@ jobs:
 
       - name: Delete Scratch Org
         if: always()
-        run: sf org delete scratch --target-org ci-scratch --no-prompt
+        run: sf org delete scratch \
+                --target-org ci-scratch \
+                --no-prompt \
+                || true
