@@ -43,7 +43,3 @@ $RECYCLE.BIN/
 **/__pycache__/
 **/.venv/
 **/venv/
-
-
-certs/server.key
-certs/server.csr
