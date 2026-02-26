@@ -1,0 +1,44 @@
+﻿name: CI Pipeline
+
+on:
+  pull_request:
+    branches:
+      - develop
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Salesforce CLI
+        run: npm install @salesforce/cli --global
+
+      - name: Authenticate Dev Hub
+        run: |
+          echo "${{ secrets.SF_JWT_KEY }}" > server.key
+          sf org login jwt \
+            --client-id ${{ secrets.SF_CLIENT_ID }} \
+            --jwt-key-file server.key \
+            --username ${{ secrets.SF_USERNAME }} \
+            --alias devhub \
+            --instance-url https://login.salesforce.com
+
+      - name: Create Scratch Org
+        run: |
+          sf org create scratch \
+            --definition-file config/project-scratch-def.json \
+            --alias ci-scratch \
+            --duration-days 1 \
+            --set-default
+
+      - name: Deploy Source
+        run: sf project deploy start
+
+      - name: Run Tests
+        run: sf apex run test --result-format human --code-coverage
+
+      - name: Delete Scratch Org
+        if: always()
+        run: sf org delete scratch --target-org ci-scratch --no-prompt
