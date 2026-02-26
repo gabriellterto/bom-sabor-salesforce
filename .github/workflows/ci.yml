@@ -15,37 +15,18 @@ jobs:
       - name: Install Salesforce CLI
         run: npm install @salesforce/cli --global
 
-      - name: Authenticate Dev Hub
+      - name: Authenticate
         run: |
           echo "${{ secrets.SF_JWT_KEY }}" > server.key
           sf org login jwt \
             --client-id ${{ secrets.SF_CLIENT_ID }} \
             --jwt-key-file server.key \
             --username ${{ secrets.SF_USERNAME }} \
-            --alias devhub \
+            --alias dev \
             --instance-url https://login.salesforce.com
 
-      - name: Set Dev Hub
-        run: sf config set target-dev-hub=devhub
-
-
-      - name: Create Scratch Org
-        run: |
-          sf org create scratch \
-            --definition-file config/project-scratch-def.json \
-            --alias devhub \
-            --duration-days 1 \
-            --set-default
-
       - name: Deploy Source
-        run: sf project deploy start
+        run: sf project deploy start --target-org dev
 
       - name: Run Tests
-        run: sf apex run test --result-format human --code-coverage
-
-      - name: Delete Scratch Org
-        if: always()
-        run: sf org delete scratch \
-                --target-org ci-scratch \
-                --no-prompt \
-                || true
+        run: sf apex run test --target-org dev --result-format human --code-coverage
